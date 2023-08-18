@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 
 import { environment } from '@environments/environment';
 import { User } from '@app/models';
+import { HttpHeaders } from '@app/_constants/http-headers';
 
 
 @Injectable({
@@ -29,7 +30,7 @@ export class AccountService {
   }
 
   login(UserName: string, Password: string) {
-    return this.http.post<User>(`${environment.apiUrl}/user/login`, { UserName, Password })
+    return this.http.post<User>(`${environment.apiUrl}/user/login`, { UserName, Password }, { headers: HttpHeaders})
         .pipe(map(user => {
             // store user details and jwt token in local storage to keep user logged in between page refreshes
             localStorage.setItem('user', JSON.stringify(user));
@@ -47,11 +48,11 @@ export class AccountService {
 
   register(user: User) {
     //return this.http.post(`${environment.apiUrl}/users/register`, user);
-    return this.http.post(`${environment.apiUrl}/user/register`, user);
+    return this.http.post(`${environment.apiUrl}/user/register`, JSON.stringify({firstName: user.firstName, lastName: user.lastName, username: user.username, password: user.password}), { headers: HttpHeaders});
   }
   
   getAll() {
-    return this.http.get<User[]>(`${environment.apiUrl}/user`);
+    return this.http.get<User[]>(`${environment.apiUrl}/user`, { headers: HttpHeaders});
 }
 
 getById(id: string) {
